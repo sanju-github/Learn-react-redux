@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { selectBook } from '../actions/index'; //importing action creator to container.
+import { bindActionCreators } from 'redux'; //need this to wire up action creator to redux.for availability of action creator to all the reducers. so that reducers can choose.
 
 class BookList extends Component{
     
@@ -16,7 +18,12 @@ class BookList extends Component{
         
         return this.props.books.map((book) => { //using return of mapStateToProps
             return(
-                <li key={book.title} className="list-group-item">{book.title}</li>
+                <li
+                key={book.title} 
+                onClick={() => this.props.selectBook(book)} //calling action creator in container.
+                className="list-group-item">
+                {book.title}
+                </li>
             );
         });
     }
@@ -42,4 +49,15 @@ function mapStateToProps(state){ //application state as argument. Here state con
     
 }
 
-export default connect(mapStateToProps)(BookList); // here mapStateToProps is function and BookList is a component and produces a container. The container is a component that is aware of the state which is contained by redux.
+//Anything returned from this function will end up as props on the BookList container.
+function mapDispatchToProps(dispatch){
+    
+    //whenever selectBook is called, the result should eb passed to all of our reducers.
+    //key selectBook and value selectBook i.e action creator
+    return bindActionCreators({ selectBook: selectBook}, dispatch); 
+    
+}
+
+
+//Promote BookList from a component to a container - it needs to know about this new dispatch method, selectBook. Make it available as a prop.
+export default connect(mapStateToProps,mapDispatchToProps)(BookList); // here mapStateToProps is function and BookList is a component and produces a container. The container is a component that is aware of the state which is contained by redux.
